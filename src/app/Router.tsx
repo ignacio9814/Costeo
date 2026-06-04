@@ -36,7 +36,7 @@ export function AppRouter() {
   return (
     <Routes>
       <Route element={<MainLayout />}>
-        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route index element={<Navigate to="/finanzas" replace />} />
         <Route path="/dashboard" element={<Lazy><Dashboard /></Lazy>} />
         <Route path="/compras" element={<Lazy><Purchases /></Lazy>} />
         <Route path="/proveedores" element={<Lazy><Suppliers /></Lazy>} />

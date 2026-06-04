@@ -14,10 +14,14 @@ import {
 
 type FormData = { type: FinanceType; category: FinanceCategory; description: string; amount: number; date: string; notes: string }
 
-function FinanceForm({ open, onClose, entry }: { open: boolean; onClose: () => void; entry?: FinanceEntry | null }) {
+function FinanceForm({ open, onClose, entry, defaultType }: { open: boolean; onClose: () => void; entry?: FinanceEntry | null; defaultType?: 'ingreso' | 'gasto' }) {
   const { addEntry, updateEntry } = useFinanceStore()
   const { register, watch, handleSubmit, reset } = useForm<FormData>({
-    defaultValues: entry ?? { type: 'gasto', category: 'materias_primas', description: '', amount: 0, date: new Date().toISOString().split('T')[0], notes: '' },
+    defaultValues: entry ?? {
+      type: defaultType ?? 'ingreso',
+      category: defaultType === 'gasto' ? 'insumos' : 'recibido_salon',
+      description: '', amount: 0, date: new Date().toISOString().split('T')[0], notes: '',
+    },
   })
   const watchedType = watch('type')
   const categories = watchedType === 'ingreso' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES
@@ -89,19 +93,50 @@ export default function Finance() {
     count: t.id === 'all' ? entries.length : entries.filter((e) => e.type === t.id).length,
   }))
 
+  const [quickType, setQuickType] = useState<'ingreso' | 'gasto' | null>(null)
+
   return (
     <div className="space-y-5 animate-fade-in">
       <PageHeader
         title="Finanzas"
-        description="Ingresos, gastos y balance mensual"
+        description="Registrá lo que recibís del salón y lo que gastás en la cocina"
         actions={<Button size="sm" icon={<Plus size={13} />} onClick={() => setFormOpen(true)}>Nuevo registro</Button>}
       />
+
+      {/* Accesos rápidos */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <button
+          onClick={() => { setQuickType('ingreso'); setFormOpen(true) }}
+          className="flex items-center gap-4 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border-2 border-emerald-200 dark:border-emerald-500/30 hover:border-emerald-400 dark:hover:border-emerald-500/60 transition-all text-left group"
+        >
+          <div className="p-3 rounded-xl bg-emerald-500 text-white flex-shrink-0 group-hover:scale-105 transition-transform">
+            <TrendingUp size={20} />
+          </div>
+          <div>
+            <div className="font-bold text-sm text-emerald-700 dark:text-emerald-400">Registrar ingreso del salón</div>
+            <div className="text-xs text-emerald-600 dark:text-emerald-500 mt-0.5">Plata recibida, adelantos, transferencias</div>
+          </div>
+        </button>
+
+        <button
+          onClick={() => { setQuickType('gasto'); setFormOpen(true) }}
+          className="flex items-center gap-4 p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border-2 border-red-200 dark:border-red-500/30 hover:border-red-400 dark:hover:border-red-500/60 transition-all text-left group"
+        >
+          <div className="p-3 rounded-xl bg-red-500 text-white flex-shrink-0 group-hover:scale-105 transition-transform">
+            <TrendingDown size={20} />
+          </div>
+          <div>
+            <div className="font-bold text-sm text-red-700 dark:text-red-400">Registrar gasto de cocina</div>
+            <div className="text-xs text-red-600 dark:text-red-500 mt-0.5">Insumos, sueldos, servicios, alquiler</div>
+          </div>
+        </button>
+      </div>
 
       {/* Monthly KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: 'Ingresos del Mes', value: monthIncome, icon: <TrendingUp size={16} />, bg: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' },
-          { label: 'Gastos del Mes', value: monthExpenses, icon: <TrendingDown size={16} />, bg: 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400' },
+          { label: 'Recibido del Salón', value: monthIncome, icon: <TrendingUp size={16} />, bg: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' },
+          { label: 'Gasto Operativo', value: monthExpenses, icon: <TrendingDown size={16} />, bg: 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400' },
           { label: 'Resultado del Mes', value: monthProfit, icon: <DollarSign size={16} />, bg: monthProfit >= 0 ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' : 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400' },
         ].map((kpi) => (
           <div key={kpi.label} className="rounded-xl bg-white dark:bg-[#1A1D2E] border border-gray-100 dark:border-gray-800 shadow-sm p-5">
@@ -124,9 +159,9 @@ export default function Finance() {
         {filtered.length === 0 ? (
           <EmptyState
             icon={<DollarSign size={26} />}
-            title="Sin registros"
-            description="Registrá ingresos y gastos para llevar el control financiero del negocio."
-            action={<Button size="sm" icon={<Plus size={13} />} onClick={() => setFormOpen(true)}>Nuevo registro</Button>}
+            title="Sin registros este mes"
+            description="Usá los botones de arriba para registrar lo que recibiste del salón o los gastos de cocina."
+            action={<Button size="sm" icon={<Plus size={13} />} onClick={() => setFormOpen(true)}>Primer registro</Button>}
           />
         ) : (
           <>
@@ -203,7 +238,7 @@ export default function Finance() {
         </div>
       )}
 
-      <FinanceForm open={formOpen} onClose={() => { setFormOpen(false); setEditing(null) }} entry={editing} />
+      <FinanceForm open={formOpen} onClose={() => { setFormOpen(false); setEditing(null); setQuickType(null) }} entry={editing} defaultType={quickType ?? undefined} />
     </div>
   )
 }
