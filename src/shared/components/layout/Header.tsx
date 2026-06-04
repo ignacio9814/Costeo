@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react'
-import { Sun, Moon, Search, Menu, Download, Upload, HardDrive, X } from 'lucide-react'
+import { Sun, Moon, Search, Menu, Download, Upload, HardDrive, X, Database } from 'lucide-react'
 import { useTheme } from '@/app/providers/ThemeProvider'
 import { useAppStore } from '@/shared/stores/useAppStore'
 import { Input } from '@/shared/components/ui/Input'
 import { exportAllData, importBackup, getLastBackupInfo } from '@/shared/utils/dataBackup'
+import { ApiKeySettings } from '@/shared/components/ApiKeySettings'
 
 function BackupModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [importing, setImporting] = useState(false)
@@ -67,10 +68,37 @@ function BackupModal({ open, onClose }: { open: boolean; onClose: () => void }) 
   )
 }
 
+function DbStatusButton({ onClick }: { onClick: () => void }) {
+  const dbConnected = useAppStore((s) => s.dbConnected)
+  const dbError = useAppStore((s) => s.dbError)
+
+  const dotColor =
+    dbConnected === null ? 'bg-yellow-400 animate-pulse' :
+    dbConnected ? 'bg-emerald-400' :
+    'bg-red-500 animate-pulse'
+
+  const label =
+    dbConnected === null ? 'Conectando...' :
+    dbConnected ? 'Base de datos conectada' :
+    `Error de conexión: ${dbError ?? 'desconocido'}`
+
+  return (
+    <button
+      onClick={onClick}
+      title={label}
+      className="relative p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+    >
+      <Database size={16} />
+      <span className={`absolute top-1.5 right-1.5 w-2 h-2 rounded-full ${dotColor}`} />
+    </button>
+  )
+}
+
 export function Header() {
   const { theme, toggleTheme } = useTheme()
   const { openMobileSidebar } = useAppStore()
   const [backupOpen, setBackupOpen] = useState(false)
+  const [dbSettingsOpen, setDbSettingsOpen] = useState(false)
 
   return (
     <>
@@ -91,6 +119,7 @@ export function Header() {
           >
             {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
           </button>
+          <DbStatusButton onClick={() => setDbSettingsOpen(true)} />
           <button
             onClick={() => setBackupOpen(true)}
             className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -101,6 +130,7 @@ export function Header() {
         </div>
       </header>
       <BackupModal open={backupOpen} onClose={() => setBackupOpen(false)} />
+      <ApiKeySettings open={dbSettingsOpen} onClose={() => setDbSettingsOpen(false)} />
     </>
   )
 }

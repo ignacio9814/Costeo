@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import { db } from '@/shared/services/db'
 import { generateId } from '@/shared/utils/id'
 import type { Purchase, PurchaseItem } from './types'
@@ -20,7 +21,9 @@ export function calcTotals(items: Omit<PurchaseItem, 'id' | 'total'>[], taxRate:
   return { subtotal, taxes, total: subtotal + taxes }
 }
 
-export const usePurchasesStore = create<PurchasesState>()((set, get) => ({
+export const usePurchasesStore = create<PurchasesState>()(
+  persist(
+    (set, get) => ({
   purchases: [],
   loading: false,
   loaded: false,
@@ -56,6 +59,9 @@ export const usePurchasesStore = create<PurchasesState>()((set, get) => ({
   },
 
   getPurchasesBySupplier: (supplierId) => get().purchases.filter((p) => p.supplierId === supplierId),
-}))
+    }),
+    { name: 'kitchen-erp-purchases', partialize: (s) => ({ purchases: s.purchases }) }
+  )
+)
 
 export { generateId }

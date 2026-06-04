@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import { db } from '@/shared/services/db'
 import { generateId } from '@/shared/utils/id'
 import type { Ingredient, PricePoint } from './types'
@@ -15,7 +16,9 @@ interface IngredientsState {
   getById: (id: string) => Ingredient | undefined
 }
 
-export const useIngredientsStore = create<IngredientsState>()((set, get) => ({
+export const useIngredientsStore = create<IngredientsState>()(
+  persist(
+    (set, get) => ({
   ingredients: [],
   loading: false,
   loaded: false,
@@ -63,4 +66,7 @@ export const useIngredientsStore = create<IngredientsState>()((set, get) => ({
   },
 
   getById: (id) => get().ingredients.find((i) => i.id === id),
-}))
+    }),
+    { name: 'kitchen-erp-ingredients', partialize: (s) => ({ ingredients: s.ingredients }) }
+  )
+)

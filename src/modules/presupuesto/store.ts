@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import { db } from '@/shared/services/db'
 import { generateId } from '@/shared/utils/id'
 import type { Presupuesto, PresupuestoLine, PresupuestoStatus } from './types'
@@ -19,7 +20,9 @@ function nextNumber(existing: Presupuesto[]): string {
   return `PRES-${String(nums.length ? Math.max(...nums) + 1 : 1).padStart(4, '0')}`
 }
 
-export const usePresupuestoStore = create<PresupuestoState>()((set, get) => ({
+export const usePresupuestoStore = create<PresupuestoState>()(
+  persist(
+    (set, get) => ({
   presupuestos: [],
   loading: false,
   loaded: false,
@@ -59,7 +62,10 @@ export const usePresupuestoStore = create<PresupuestoState>()((set, get) => ({
     set((s) => ({ presupuestos: s.presupuestos.filter((p) => p.id !== id) }))
     db.presupuestos.delete(id).catch((err) => console.error('[Presupuesto] Error deleting:', err))
   },
-}))
+    }),
+    { name: 'kitchen-erp-presupuesto', partialize: (s) => ({ presupuestos: s.presupuestos }) }
+  )
+)
 
 export function calcLines(lines: PresupuestoLine[], people: number): { subtotal: number; lines: PresupuestoLine[] } {
   const updated = lines.map((l) => ({ ...l, people: l.people || people, subtotal: l.pricePerPerson * (l.people || people) }))

@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import { db } from '@/shared/services/db'
 import { generateId } from '@/shared/utils/id'
 import type { Recipe } from './types'
@@ -13,7 +14,9 @@ interface RecipesState {
   deleteRecipe: (id: string) => void
 }
 
-export const useRecipesStore = create<RecipesState>()((set, get) => ({
+export const useRecipesStore = create<RecipesState>()(
+  persist(
+    (set, get) => ({
   recipes: [],
   loading: false,
   loaded: false,
@@ -47,4 +50,7 @@ export const useRecipesStore = create<RecipesState>()((set, get) => ({
     set((s) => ({ recipes: s.recipes.filter((r) => r.id !== id) }))
     db.recipes.delete(id).catch((err) => console.error('[Recipes] Error deleting:', err))
   },
-}))
+    }),
+    { name: 'kitchen-erp-recipes', partialize: (s) => ({ recipes: s.recipes }) }
+  )
+)

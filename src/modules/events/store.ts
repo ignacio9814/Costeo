@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import { db } from '@/shared/services/db'
 import { generateId } from '@/shared/utils/id'
 import type { GastronomicEvent } from './types'
@@ -13,7 +14,9 @@ interface EventsState {
   deleteEvent: (id: string) => void
 }
 
-export const useEventsStore = create<EventsState>()((set, get) => ({
+export const useEventsStore = create<EventsState>()(
+  persist(
+    (set, get) => ({
   events: [],
   loading: false,
   loaded: false,
@@ -47,4 +50,7 @@ export const useEventsStore = create<EventsState>()((set, get) => ({
     set((s) => ({ events: s.events.filter((e) => e.id !== id) }))
     db.events.delete(id).catch((err) => console.error('[Events] Error deleting:', err))
   },
-}))
+    }),
+    { name: 'kitchen-erp-events', partialize: (s) => ({ events: s.events }) }
+  )
+)

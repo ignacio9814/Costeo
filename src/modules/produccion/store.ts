@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import { db } from '@/shared/services/db'
 import { generateId } from '@/shared/utils/id'
 import {
@@ -47,7 +48,9 @@ function saveWeek(weeks: ProductionWeek[], weekId: string) {
 }
 
 // ─── Store ────────────────────────────────────────────────────────────────────
-export const useProduccionStore = create<ProduccionState>()((set, get) => ({
+export const useProduccionStore = create<ProduccionState>()(
+  persist(
+    (set, get) => ({
   weeks: [],
   loading: false,
   loaded: false,
@@ -144,4 +147,7 @@ export const useProduccionStore = create<ProduccionState>()((set, get) => ({
     set({ weeks })
     saveWeek(weeks, weekId)
   },
-}))
+    }),
+    { name: 'kitchen-erp-produccion', partialize: (s) => ({ weeks: s.weeks }) }
+  )
+)

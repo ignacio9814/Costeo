@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import { db } from '@/shared/services/db'
 import { generateId } from '@/shared/utils/id'
 import type { Supplier } from './types'
@@ -14,7 +15,9 @@ interface SuppliersState {
   getById: (id: string) => Supplier | undefined
 }
 
-export const useSuppliersStore = create<SuppliersState>()((set, get) => ({
+export const useSuppliersStore = create<SuppliersState>()(
+  persist(
+    (set, get) => ({
   suppliers: [],
   loading: false,
   loaded: false,
@@ -50,4 +53,7 @@ export const useSuppliersStore = create<SuppliersState>()((set, get) => ({
   },
 
   getById: (id) => get().suppliers.find((s) => s.id === id),
-}))
+    }),
+    { name: 'kitchen-erp-suppliers', partialize: (s) => ({ suppliers: s.suppliers }) }
+  )
+)

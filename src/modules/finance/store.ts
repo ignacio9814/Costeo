@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import { db } from '@/shared/services/db'
 import { generateId } from '@/shared/utils/id'
 import type { FinanceEntry } from './types'
@@ -14,7 +15,9 @@ interface FinanceState {
   getMonthlyBalance: (year: number, month: number) => { income: number; expenses: number; profit: number }
 }
 
-export const useFinanceStore = create<FinanceState>()((set, get) => ({
+export const useFinanceStore = create<FinanceState>()(
+  persist(
+    (set, get) => ({
   entries: [],
   loading: false,
   loaded: false,
@@ -56,4 +59,7 @@ export const useFinanceStore = create<FinanceState>()((set, get) => ({
     const expenses = filtered.filter((e) => e.type === 'gasto').reduce((s, e) => s + e.amount, 0)
     return { income, expenses, profit: income - expenses }
   },
-}))
+    }),
+    { name: 'kitchen-erp-finance', partialize: (s) => ({ entries: s.entries }) }
+  )
+)

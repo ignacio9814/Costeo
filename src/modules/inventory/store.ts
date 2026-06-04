@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import { db } from '@/shared/services/db'
 import { generateId } from '@/shared/utils/id'
 import type { StockMovement, StockLevel, MovementType } from './types'
@@ -24,7 +25,9 @@ function applyMovement(current: number, type: MovementType, qty: number): number
   }
 }
 
-export const useInventoryStore = create<InventoryState>()((set, get) => ({
+export const useInventoryStore = create<InventoryState>()(
+  persist(
+    (set, get) => ({
   movements: [],
   stockLevels: [],
   loading: false,
@@ -82,4 +85,7 @@ export const useInventoryStore = create<InventoryState>()((set, get) => ({
 
   getLowStockItems: () =>
     get().stockLevels.filter((l) => l.minStock > 0 && l.currentStock <= l.minStock),
-}))
+    }),
+    { name: 'kitchen-erp-inventory', partialize: (s) => ({ movements: s.movements, stockLevels: s.stockLevels }) }
+  )
+)
