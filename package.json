@@ -1,47 +1,43 @@
 {
-  "name": "costeo",
-  "version": "1.0.0",
-  "description": "Sistema de cotización paramétrica para eventos gastronómicos",
+  "name": "kitchen-erp",
+  "version": "2.0.0",
+  "description": "Plataforma profesional de gestión gastronómica",
   "private": true,
   "dependencies": {
-    "@types/node": "^18.15.0",
-    "@types/react": "^18.0.28",
-    "@types/react-dom": "^18.0.11",
+    "@supabase/supabase-js": "^2.107.0",
+    "@tanstack/react-table": "^8.11.0",
+    "clsx": "^2.1.0",
+    "date-fns": "^3.6.0",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2",
+    "lucide-react": "^0.394.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
-    "typescript": "^4.9.5",
-    "tailwindcss": "^3.2.7",
-    "autoprefixer": "^10.4.14",
-    "postcss": "^8.4.21",
-    "lucide-react": "^0.323.0",
-    "clsx": "^1.2.1"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "react-dropzone": "^14.2.3",
+    "react-hook-form": "^7.51.0",
+    "react-router-dom": "^6.22.3",
+    "recharts": "^2.12.2",
+    "tailwind-merge": "^2.2.1",
+    "tesseract.js": "^7.0.0",
+    "xlsx": "^0.18.5",
+    "zod": "^3.22.4",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
-    "@types/jest": "^27.5.2"
+    "@types/node": "^20.11.24",
+    "@types/react": "^18.2.61",
+    "@types/react-dom": "^18.2.19",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.18",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.1.4"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit"
   }
 }
