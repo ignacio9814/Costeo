@@ -509,7 +509,7 @@ async function generateSantinoReceipt(p: Presupuesto) {
   doc.setFontSize(7.5)
   doc.setTextColor(120)
   doc.text('Este documento es una cotización y no constituye una factura fiscal.', W / 2, pageH - 10, { align: 'center' })
-  doc.text(`Emitido por Kitchen ERP — ${today()}`, W / 2, pageH - 6, { align: 'center' })
+  doc.text(`Emitido por Sistema Cofradía — ${today()}`, W / 2, pageH - 6, { align: 'center' })
 
   doc.save(`Cotizacion-${p.number}-${p.clientName.replace(/\s+/g, '_')}.pdf`)
 }

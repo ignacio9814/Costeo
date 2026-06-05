@@ -101,7 +101,7 @@ export function Sidebar() {
           </div>
           {!sidebarCollapsed && (
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate leading-tight">Kitchen ERP</div>
+              <div className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate leading-tight">Sistema Cofradía</div>
               <div className="text-[10px] text-gray-400 truncate">Gestión Gastronómica</div>
             </div>
           )}

@@ -80,7 +80,7 @@ async function pdfDownload(title: string, subtitle: string, headers: string[], r
 
   const finalY = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY
   doc.setFont('helvetica', 'italic'); doc.setFontSize(7.5); doc.setTextColor(130)
-  doc.text(`Generado el ${formatDate(today())} · Kitchen ERP`, 14, finalY + 10)
+  doc.text(`Generado el ${formatDate(today())} · Sistema Cofradía`, 14, finalY + 10)
 
   doc.save(`${title.replace(/\s+/g, '_')}_${today()}.pdf`)
 }

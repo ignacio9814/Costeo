@@ -34,7 +34,7 @@ export function exportAllData(): void {
   const backup: BackupData = {
     version: '1.0',
     exportedAt: new Date().toISOString(),
-    appName: 'Kitchen ERP',
+    appName: 'Sistema Cofradía',
     stores,
   }
 
@@ -55,7 +55,7 @@ export async function importBackup(file: File): Promise<{ success: boolean; mess
     const data: BackupData = JSON.parse(text)
 
     if (!data.stores || !data.version) {
-      return { success: false, message: 'El archivo no es un backup válido de Kitchen ERP.' }
+      return { success: false, message: 'El archivo no es un backup válido de Sistema Cofradía.' }
     }
 
     let restored = 0

@@ -66,7 +66,7 @@ export function SetupScreen({ onComplete }: SetupScreenProps) {
           <div className="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center mx-auto mb-4">
             <ChefHat size={28} className="text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Kitchen ERP</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Sistema Cofradía</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Configuración inicial de base de datos</p>
         </div>
 
