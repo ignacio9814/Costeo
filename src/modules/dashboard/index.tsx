@@ -1,4 +1,4 @@
-import { Plus, Wallet, ShoppingBasket, Users, TrendingUp, ShoppingCart, BarChart3 } from 'lucide-react'
+import { Plus, Wallet, ShoppingBasket, Users, TrendingUp, ShoppingCart, BarChart3, DollarSign } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/shared/components/ui/Button'
 import { PageHeader } from '@/shared/components/layout/PageHeader'
