@@ -1,6 +1,6 @@
 {
   "rewrites": [{ "source": "/((?!api/).*)", "destination": "/" }],
   "functions": {
-    "api/ocr.ts": { "maxDuration": 30 }
+    "api/ocr.js": { "maxDuration": 30 }
   }
 }
