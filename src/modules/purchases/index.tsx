@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { Plus, Pencil, Trash2, ShoppingCart, Search } from 'lucide-react'
+import { Plus, Pencil, Trash2, ShoppingCart, Search, Camera } from 'lucide-react'
 import { Button, Badge, Input, Tabs, EmptyState } from '@/shared/components/ui'
 import { PageHeader } from '@/shared/components/layout/PageHeader'
 import { Card } from '@/shared/components/ui/Card'
 import { usePurchasesStore } from './store'
 import { PurchaseForm } from './components/PurchaseForm'
+import { OCRUploader, type ParsedDocument } from './components/OCRUploader'
 import { formatCurrency } from '@/shared/utils/currency'
 import { formatDate } from '@/shared/utils/date'
 import type { Purchase } from './types'
@@ -36,6 +37,8 @@ export default function Purchases() {
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<Purchase | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [ocrOpen, setOcrOpen] = useState(false)
+  const [ocrData, setOcrData] = useState<Partial<ParsedDocument> | null>(null)
 
   const filtered = purchases
     .filter((p) => activeTab === 'all' || p.status === activeTab)
@@ -56,9 +59,14 @@ export default function Purchases() {
         title="Compras"
         description={`${purchases.length} registro${purchases.length !== 1 ? 's' : ''} · ${formatCurrency(totalMonth)} este mes`}
         actions={
-          <Button size="sm" icon={<Plus size={13} />} onClick={() => setFormOpen(true)}>
-            Nueva compra
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="secondary" icon={<Camera size={13} />} onClick={() => setOcrOpen(true)}>
+              Escanear
+            </Button>
+            <Button size="sm" icon={<Plus size={13} />} onClick={() => setFormOpen(true)}>
+              Nueva compra
+            </Button>
+          </div>
         }
       />
 
@@ -152,7 +160,17 @@ export default function Purchases() {
         </div>
       )}
 
-      <PurchaseForm open={formOpen} onClose={() => { setFormOpen(false); setEditing(null) }} purchase={editing} />
+      <OCRUploader
+        open={ocrOpen}
+        onClose={() => setOcrOpen(false)}
+        onConfirm={(data) => { setOcrData(data); setOcrOpen(false); setFormOpen(true) }}
+      />
+      <PurchaseForm
+        open={formOpen}
+        onClose={() => { setFormOpen(false); setEditing(null); setOcrData(null) }}
+        purchase={editing}
+        prefilledData={ocrData ?? undefined}
+      />
     </div>
   )
 }

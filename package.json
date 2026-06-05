@@ -4,6 +4,7 @@
   "description": "Plataforma profesional de gestión gastronómica",
   "private": true,
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.100.1",
     "@supabase/supabase-js": "^2.107.0",
     "@tanstack/react-table": "^8.11.0",
     "clsx": "^2.1.0",

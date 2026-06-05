@@ -1,2 +1,6 @@
-// Este módulo fue eliminado. El OCR fue removido temporalmente.
-export {}
+export interface InvoiceItem {
+  name: string
+  quantity: number
+  unit: string
+  unitPrice: number
+}
