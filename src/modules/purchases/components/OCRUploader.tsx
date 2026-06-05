@@ -46,17 +46,25 @@ export function OCRUploader({ open, onClose, onConfirm }: Props) {
 
   function handleFile(file: File) {
     if (!file.type.startsWith('image/')) return
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const dataUrl = e.target?.result as string
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      // Resize to max 1600px to stay under Vercel's 4.5MB body limit
+      const MAX = 1600
+      const scale = Math.min(1, MAX / Math.max(img.width, img.height))
+      const canvas = document.createElement('canvas')
+      canvas.width = Math.round(img.width * scale)
+      canvas.height = Math.round(img.height * scale)
+      const ctx = canvas.getContext('2d')!
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.88)
       setPreview(dataUrl)
-      const base64 = dataUrl.split(',')[1]
-      const mediaType = file.type
-      setImageData({ base64, mediaType })
+      setImageData({ base64: dataUrl.split(',')[1], mediaType: 'image/jpeg' })
       setState('idle')
       setResult(null)
     }
-    reader.readAsDataURL(file)
+    img.src = url
   }
 
   async function analyze() {
@@ -69,9 +77,15 @@ export function OCRUploader({ open, onClose, onConfirm }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image: imageData.base64, mediaType: imageData.mediaType }),
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error ?? 'Error del servidor')
-      setResult(data)
+      const text = await res.text()
+      let data: Record<string, unknown>
+      try {
+        data = JSON.parse(text)
+      } catch {
+        throw new Error(`Error del servidor (${res.status}): ${text.slice(0, 120)}`)
+      }
+      if (!res.ok) throw new Error((data.error as string) ?? 'Error del servidor')
+      setResult(data as Partial<ParsedDocument>)
       setState('done')
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'Error desconocido')
