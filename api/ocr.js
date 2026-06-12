@@ -34,9 +34,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY
+  const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
-    return res.status(500).json({ error: 'ANTHROPIC_API_KEY no configurada en el servidor' })
+    return res.status(500).json({ error: 'GEMINI_API_KEY no configurada en el servidor' })
   }
 
   const { image, mediaType } = req.body
@@ -45,41 +45,43 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1024,
-        messages: [
-          {
-            role: 'user',
-            content: [
-              {
-                type: 'image',
-                source: { type: 'base64', media_type: mediaType, data: image },
-              },
-              { type: 'text', text: PROMPT },
-            ],
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  inline_data: {
+                    mime_type: mediaType,
+                    data: image,
+                  },
+                },
+                { text: PROMPT },
+              ],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.1,
+            maxOutputTokens: 1024,
           },
-        ],
-      }),
-    })
+        }),
+      }
+    )
 
     const json = await response.json()
 
     if (!response.ok) {
-      return res.status(502).json({ error: json.error?.message ?? 'Error de la API de Claude' })
+      return res.status(502).json({ error: json.error?.message ?? 'Error de la API de Gemini' })
     }
 
-    const raw = json.content?.[0]?.type === 'text' ? json.content[0].text : ''
+    const raw = json.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
     const match = raw.match(/\{[\s\S]*\}/)
     if (!match) {
-      return res.status(422).json({ error: 'Claude no devolvió JSON', raw })
+      return res.status(422).json({ error: 'Gemini no devolvió JSON válido', raw })
     }
 
     return res.status(200).json(JSON.parse(match[0]))
